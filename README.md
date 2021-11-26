@@ -12,7 +12,7 @@ Actions:
   
  -join lobby
   -> index.php?u=<PLAYERID(0-9)>&a=4&l=<LOBBYID(0-9)>
-  <- Number of players in Lobby|Player ID|Player ID|Player ID|Player ID `1|324|532|145`
+  <- Number of players in Lobby|Player ID|Player ID|Player ID|Player ID `3|324|532|145`
   
  -start game
   -> index.php?u=<PLAYERID(0-9)>&a=5&l=<LOBBYID(0-9)>
