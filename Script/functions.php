@@ -114,8 +114,10 @@
     $fileList = glob($GLOBALS["doc_root"] . "/Data/*.txt");
     foreach($fileList as $filename){
       if(is_file($filename)){
-	    if($filename[0] == "l"){
-		  $t = explode(".", $filename, 2);
+		$tfn = explode("/", $filename);
+		$fn = end($tfn);
+	    if($fn[0] == "l"){
+		  $t = explode(".", $fn, 2);
 		  $tn = explode("_", $t[0], 2);
 		  $lobbyid = $tn[1];
 		  $result_array[] = get_lobby_player_count($lobbyid) . ":" . $lobbyid;
