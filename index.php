@@ -71,7 +71,7 @@
     }
   }
 
-  if($_GET["a"] <= 0 || $_GET["a"] >= 7){
+  if($_GET["a"] <= 0 || $_GET["a"] >= 8){
     $output = "Unknown Request!";
     echo $output;
     die();
@@ -97,6 +97,9 @@
   }elseif($_GET["a"] == 6){
     $action = "leavelobby";
     $lobbyid = $_GET["l"];
+  }elseif($_GET["a"] == 7){
+    $action = "waitinlobby";
+    $lobbyid = $_GET["l"];
   }
  
   if($action == "listlobbies"){
@@ -111,6 +114,8 @@
   }elseif($action == "leavelobby"){
     leave_lobby($lobbyid);
     $output = create_lobbylist();
+  }elseif($action == "waitinlobby"){
+    $output = wait_in_lobby($lobbyid);
   }
 
   echo $output;

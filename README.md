@@ -14,14 +14,14 @@ Actions:
 
   -> index.php?u=<PLAYERID(0-9)>&a=3&s=<GAMEMODE(0-9)>
 
-  <- Number of players in Lobby|Player ID `1|324`
+  <- Status of Lobby|Number of players in Lobby|Player ID `P|1|324`
 
 
  -join lobby
 
   -> index.php?u=<PLAYERID(0-9)>&a=4&l=<LOBBYID(0-9)>
 
-  <- Number of players in Lobby|Player ID|Player ID|Player ID|Player ID `3|324|532|145`
+  <- Status of Lobby|Number of players in Lobby|Player ID|Player ID|Player ID|Player ID `P|3|324|532|145`
 
  
  -start game
@@ -37,4 +37,13 @@ Actions:
 
   <- Number of Lobbies|Number of players in Lobby:Lobby ID| `2|3:123|2:124`
 
- 
+
+ -wait in lobby
+
+  -> index.php?u=<PLAYERID(0-9)>&a=7&l=<LOBBYID(0-9)>
+
+  <- Status of Lobby|Number of players in Lobby|Player ID|Player ID|Player ID|Player ID `P|3|324|532|145`
+
+or
+
+  <- Player ID:Player IP|Player ID:Player IP|Player ID:Player IP|Player ID:Player IP `324:123.123.123.123|532:123.123.123.123|145:123.123.123.123|452:123.123.123.123`

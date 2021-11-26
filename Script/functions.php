@@ -124,6 +124,16 @@
     $return = $lobbyfile_data_string;
     return $return;
   }
+
+  function wait_in_lobby($lobbyid){
+    $ls = get_lobby_status($lobbyid);
+	if($ls == "P"){
+      $result = lobby_to_string($lobbyid);
+	}elseif($ls == "S"){
+      $result = get_handshake_string($lobbyid);
+	}
+    return $result;
+  }
   
   function create_lobbylist(){
     $result_array = array();
@@ -137,8 +147,10 @@
           $t = explode(".", $fn, 2);
           $tn = explode("_", $t[0], 2);
           $lobbyid = $tn[1];
-          $result_array[] = get_lobby_player_count($lobbyid) . ":" . $lobbyid;
-          $lobbycount++;
+		  if(get_lobby_status($lobbyid) == "P"){
+            $result_array[] = get_lobby_player_count($lobbyid) . ":" . $lobbyid;
+            $lobbycount++;
+		  }
         }
       }
     }
@@ -150,8 +162,17 @@
     $lobbyfile = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt";
     $lobbyfile_data = file_get_contents($lobbyfile);
     $lobbyfile_data_array = explode("|", $lobbyfile_data);
-    $playercount = $lobbyfile_data_array[0];
+    $playercount = $lobbyfile_data_array[1];
     $return = $playercount;
+    return $return;
+  }
+
+  function get_lobby_status($lobbyid){
+    $lobbyfile = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt";
+    $lobbyfile_data = file_get_contents($lobbyfile);
+    $lobbyfile_data_array = explode("|", $lobbyfile_data);
+    $s = $lobbyfile_data_array[0];
+    $return = $s;
     return $return;
   }
 
