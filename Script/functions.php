@@ -90,7 +90,7 @@
 
   function get_index(){
     $file = $GLOBALS["doc_root"] . "/Data/index.txt";
-    $file_data_string = file_get_contents($userfile);
+    $file_data_string = file_get_contents($file);
     $file_data_string = intval($file_data_string);
     return $file_data_string;
   }
@@ -142,16 +142,6 @@
     $lobbyfile_data_string = file_get_contents($lobbyfile);
     $return = $lobbyfile_data_string;
     return $return;
-  }
-
-  function wait_in_lobby($lobbyid){
-    $ls = get_lobby_status($lobbyid);
-    if($ls == "P"){
-      $result = lobby_to_string($lobbyid);
-    }elseif($ls == "S"){
-      $result = get_handshake_string($lobbyid);
-    }
-    return $result;
   }
   
   function create_lobbylist(){
