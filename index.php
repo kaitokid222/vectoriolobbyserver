@@ -55,7 +55,7 @@
     }
   }
 
-  if($_GET["a"] == 4 || $_GET["a"] == 5 || $_GET["a"] == 6){
+  if($_GET["a"] == 4 || $_GET["a"] == 5 || $_GET["a"] == 6 || $_GET["a"] == 7){
     if(!isset($_GET["l"]) || empty($_GET["l"])){
       $output = "Missing Input Lobby ID";
       echo $output;
@@ -108,7 +108,7 @@
     $lid = create_lobby($gamemode);
     $output = join_lobby($lid);
   }elseif($action == "startgame"){
-    $output = get_handshake_string($lobbyid);
+    $output = start_lobby($lobbyid);
   }elseif($action == "joinlobby"){
     $output = join_lobby($lobbyid);
   }elseif($action == "leavelobby"){
