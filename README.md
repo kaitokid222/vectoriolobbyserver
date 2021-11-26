@@ -16,4 +16,4 @@ Actions:
   
  -start game
   -> index.php?u=<PLAYERID(0-9)>&a=5&l=<LOBBYID(0-9)>
-  <- Player ID:Player IP|Player ID:Player IP|Player ID:Player IP|Player ID:Player IP `324:123.123.123.123|532:123.123.123.123|145:123.123.123.123|452::123.123.123.123`
+  <- Player ID:Player IP|Player ID:Player IP|Player ID:Player IP|Player ID:Player IP `324:123.123.123.123|532:123.123.123.123|145:123.123.123.123|452:123.123.123.123`
