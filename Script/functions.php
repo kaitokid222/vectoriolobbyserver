@@ -84,7 +84,7 @@
   }
 
   function create_lobby($s){
-    $lobbysting = "0|". $s;
+    $lobbysting = "P|0|". $s;
     $i = get_next_index();
     file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $i . ".txt", $lobbysting);
     file_put_contents($GLOBALS["doc_root"] . "/Data/index.txt", $i);
@@ -94,11 +94,28 @@
   function join_lobby($lobbyid){
     $lobby = lobby_to_string($lobbyid);
     $lobby_array = explode("|", $lobby);
-    $lobby_array[0] = intval($lobby_array[0])+1;
+    $lobby_array[1] = intval($lobby_array[1])+1;
     $lobby = implode("|", $lobby_array);
     $lobby .= "|" . $GLOBALS["user_id"];
     file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt", $lobby);
     return $lobby;
+  }
+
+  function leave_lobby($lobbyid){
+    $lobby = lobby_to_string($lobbyid);
+    $lobby_array = explode("|", $lobby);
+    $lobby_array[1] = intval($lobby_array[1])-1;
+    $players = array_slice($lobby_array, 2,4);
+    $narr = array();
+    $narr[] = $lobby_array[0];
+    $narr[] = $lobby_array[1];
+    foreach($players as $player){
+      if($player != $GLOBALS["user_id"]){
+        $narr[] = $player;
+      }
+    }
+    $lobby = implode("|", $narr);
+    file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt", $lobby);
   }
 
   function lobby_to_string($lobbyid){

@@ -8,6 +8,7 @@
   //index.php?u=1234567890&a=3$s=1 (gamemode?)
   //index.php?u=1234567890&a=4&l=12345
   //index.php?u=1234567890&a=5&l=12345
+  //index.php?u=1234567890&a=6&l=12345
 
   //Check Input
   if(!isset($_GET["u"]) || empty($_GET["u"])){
@@ -54,7 +55,7 @@
     }
   }
 
-  if($_GET["a"] == 4 || $_GET["a"] == 5){
+  if($_GET["a"] == 4 || $_GET["a"] == 5 || $_GET["a"] == 6){
     if(!isset($_GET["l"]) || empty($_GET["l"])){
       $output = "Missing Input Lobby ID";
       echo $output;
@@ -70,7 +71,7 @@
     }
   }
 
-  if($_GET["a"] <= 0 || $_GET["a"] >= 6){
+  if($_GET["a"] <= 0 || $_GET["a"] >= 7){
     $output = "Unknown Request!";
     echo $output;
     die();
@@ -93,6 +94,9 @@
   }elseif($_GET["a"] == 5){
     $action = "startgame";
     $lobbyid = $_GET["l"];
+  }elseif($_GET["a"] == 6){
+    $action = "leavelobby";
+    $lobbyid = $_GET["l"];
   }
  
   if($action == "listlobbies"){
@@ -104,6 +108,9 @@
     $output = get_handshake_string($lobbyid);
   }elseif($action == "joinlobby"){
     $output = join_lobby($lobbyid);
+  }elseif($action == "leavelobby"){
+    leave_lobby($lobbyid);
+    $output = create_lobbylist();
   }
 
   echo $output;
