@@ -23,7 +23,7 @@
           $t = explode(".", $fn, 2);
           $tn = explode("_", $t[0], 2);
           $result_array[$i]["id"] = $tn[1];
-          $result_array[$i]["ip"] = file_get_contents($GLOBALS["doc_root"] . "/Data/user_" . $userid . ".txt")
+          $result_array[$i]["ip"] = file_get_contents($GLOBALS["doc_root"] . "/Data/user_" . $tn[1] . ".txt")
           $i = $i+1;
         }
       }
