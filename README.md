@@ -1,6 +1,8 @@
 # vectoriolobbyserver
 This is an ultra lightweight lobby service which can be deployed on freehosters since it only requires any version of PHP5+
 
+PLAYERID is SteamID64 `76561197960287930`
+
 Actions:
 
  -list lobbies

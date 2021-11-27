@@ -11,38 +11,46 @@
     return $ip;
   }
 
-  function update_users($id,$ip){
-    $newstring = "";
-    $player_is_in_file = 0;
-    $userfile = $GLOBALS["doc_root"] . "/Data/users.txt";
-    $userfile_data_string = file_get_contents($userfile);
-    $userfile_data = explode("|", $userfile_data_string);
-    if(count($userfile_data) > 0){
-      foreach($userfile_data as $player){
-        $t = explode(":",$player);
-        if($t[0] == $id){
-          $player_is_in_file = 1;
-          $t[1] = $ip;
+  function create_user_array(){
+    $result_array = array();
+    $fileList = glob($GLOBALS["doc_root"] . "/Data/*.txt");
+	$i = 0;
+    foreach($fileList as $filename){
+      if(is_file($filename)){
+        $tfn = explode("/", $filename);
+        $fn = end($tfn);
+        if($fn[0] == "u"){
+          $t = explode(".", $fn, 2);
+          $tn = explode("_", $t[0], 2);
+          $result_array[$i]["id"] = $tn[1];
+          $result_array[$i]["ip"] = file_get_contents($GLOBALS["doc_root"] . "/Data/user_" . $userid . ".txt")
+		  $i = $i+1;
         }
-        if(!empty($t[0]) && !empty($t[1]))
-          $newstring .= $t[0].":".$t[1]."|";
       }
     }
-    if($player_is_in_file == 0){
-      $newstring .= $id.":".$ip."|";
-    }
-    file_put_contents($userfile, $newstring);
+    return $result_array;
+  }
+
+  function update_user_file($userid,$ip){
+	$p = $GLOBALS["doc_root"] . "/Data/user_" . $userid . ".txt";
+    if(!file_exists($p))
+	  create_user_file($userid,$ip);
+    else{
+	  $sip = file_get_contents($p);
+	  if($sip != $ip)
+        create_user_file($userid,$ip);
+	}
+  }
+
+  function create_user_file($userid,$ip){
+    file_put_contents($GLOBALS["doc_root"] . "/Data/user_" . $userid . ".txt", $ip);
   }
 
   function get_user_ip_from_id($id){
     $r = "";
-    $userfile = $GLOBALS["doc_root"] . "/Data/users.txt";
-    $userfile_data_string = file_get_contents($userfile);
-    $userfile_data = explode("|", $userfile_data_string);
-    foreach($userfile_data as $player){
-      $t = explode(":",$player);
-      if($t[0] == $id){
-        $r = $t[1];
+    foreach($GLOBALS["users"] as $player){
+      if($player["id"] == $id){
+        $r = $player["ip"];
         break;
       }
     }
@@ -69,10 +77,11 @@
 
   function get_handshake_string($lobbyid){
     $return_string = "";
+	$GLOBALS["users"] = create_user_array();
     $players = array();
     $lobby = explode("|", lobby_to_string($lobbyid));
-    $i = 2;
-    while($i<6){
+    $i = 3;
+    while($i<7){
       if(!empty($lobby[$i])){
         $players[] = $lobby[$i];
       }else{
@@ -88,16 +97,20 @@
     return $return_string;
   }
 
-  function get_index(){
-    $file = $GLOBALS["doc_root"] . "/Data/index.txt";
-    $file_data_string = file_get_contents($file);
-    $file_data_string = intval($file_data_string);
-    return $file_data_string;
-  }
-
   function get_next_index(){
-    $i = get_index();
-    $i = $i+1;
+    $i = 1;
+	$p = "";
+	$c = false;
+	$r = 0;
+	while($c === false){
+	  $p = $GLOBALS["doc_root"] . "/Data/index_" . $i . ".txt";
+	  if(!file_exists($p)){
+		$r = $i;
+	    $c = true;
+	    break;
+	  }
+	  $i = $i+1;
+	}
     return $i;
   }
 
@@ -105,43 +118,77 @@
     $i = get_next_index();
     $lobbysting = $i . "|P|0|". $s;
     file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $i . ".txt", $lobbysting);
-    file_put_contents($GLOBALS["doc_root"] . "/Data/index.txt", $i);
+    file_put_contents($GLOBALS["doc_root"] . "/Data/index_" . $i . ".txt", $i);
     return $i;
   }
 
   function join_lobby($lobbyid){
+	$fls = get_free_lobbyspot($lobbyid);
+    file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . "_" . $fls . ".txt", $GLOBALS["user_id"]);
     $lobby = lobby_to_string($lobbyid);
-    $lobby_array = explode("|", $lobby);
-    $lobby_array[2] = intval($lobby_array[2])+1;
-    $lobby = implode("|", $lobby_array);
-    $lobby .= "|" . $GLOBALS["user_id"];
-    file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt", $lobby);
     return $lobby;
   }
 
   function leave_lobby($lobbyid){
-    $lobby = lobby_to_string($lobbyid);
-    $lobby_array = explode("|", $lobby);
-    $lobby_array[2] = intval($lobby_array[2])-1;
-    $players = array_slice($lobby_array, 2,4);
-    $narr = array();
-    $narr[] = $lobby_array[0];
-    $narr[] = $lobby_array[1];
-    $narr[] = $lobby_array[2];
-    foreach($players as $player){
-      if($player != $GLOBALS["user_id"]){
-        $narr[] = $player;
-      }
-    }
-    $lobby = implode("|", $narr);
-    file_put_contents($GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt", $lobby);
+    delete_user_in_lobby_file($lobbyid);
+  }
+  
+  function delete_user_in_lobby_file($lobbyid){
+	$i = 1;
+	$p = "";
+	$r = 0;
+	while($i <= 4){
+	  $p = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . "_" . $i . ".txt";
+	  if(file_exists($p)){
+	    $fuid = file_get_contents($p);
+		if($fuid == $GLOBALS["user_id"]){
+		  unlink($p);
+		  break;
+		}
+	  }
+	  $i = $i+1;
+	}
+	return $r;
   }
 
   function lobby_to_string($lobbyid){
     $lobbyfile = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt";
     $lobbyfile_data_string = file_get_contents($lobbyfile);
-    $return = $lobbyfile_data_string;
+	$lobby_array = explode("|", $lobbyfile_data_string);
+	$lobby_array[2] = get_lobby_player_count($lobbyid);
+	$lobbyfile_data_string = implode("|", $lobby_array);
+    $return = $lobbyfile_data_string . "" . create_lobby_player_string($lobbyid);
     return $return;
+  }
+  
+  function create_lobby_player_string($lobbyid){
+	$i = 1;
+	$p = "";
+	$r = "";
+	while($i <= 4){
+	  $p = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . "_" . $i . ".txt";
+	  if(file_exists($p)){
+		$id = file_get_contents($p);
+	    $r .= "|" . $id;
+	  }
+	  $i = $i+1;
+	}
+    return $r;
+  }
+  
+  function get_free_lobbyspot($lobbyid){
+	$i = 1;
+	$p = "";
+	$r = 0;
+	while($i <= 4){
+	  $p = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . "_" . $i . ".txt";
+	  if(!file_exists($p)){
+	    $r = $i;
+		break;
+	  }
+	  $i = $i+1;
+	}
+	return $r;
   }
   
   function create_lobbylist(){
@@ -154,12 +201,14 @@
         $fn = end($tfn);
         if($fn[0] == "l"){
           $t = explode(".", $fn, 2);
-          $tn = explode("_", $t[0], 2);
-          $lobbyid = $tn[1];
-          if(get_lobby_status($lobbyid) == "P"){
-            $result_array[] = get_lobby_player_count($lobbyid) . ":" . $lobbyid;
-            $lobbycount++;
-          }
+          $tn = explode("_", $t[0]);
+		  if(empty($tn[3])){
+			$lobbyid = $tn[1];
+            if(get_lobby_status($lobbyid) == "P"){
+              $result_array[] = get_lobby_player_count($lobbyid) . ":" . $lobbyid;
+              $lobbycount++;
+            }
+		  }
         }
       }
     }
@@ -168,12 +217,17 @@
   }
 
   function get_lobby_player_count($lobbyid){
-    $lobbyfile = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . ".txt";
-    $lobbyfile_data = file_get_contents($lobbyfile);
-    $lobbyfile_data_array = explode("|", $lobbyfile_data);
-    $playercount = $lobbyfile_data_array[2];
-    $return = $playercount;
-    return $return;
+	$i = 1;
+	$p = "";
+	$r = 0;
+	while($i <= 4){
+	  $p = $GLOBALS["doc_root"] . "/Data/lobby_" . $lobbyid . "_" . $i . ".txt";
+	  if(file_exists($p)){
+	    $r = $r+1;
+	  }
+	  $i = $i+1;
+	}
+    return $r;
   }
 
   function get_lobby_status($lobbyid){

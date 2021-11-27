@@ -1,4 +1,8 @@
 <?php
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  error_reporting(E_ALL);
+
 
   $GLOBALS["doc_root"] = $_SERVER["DOCUMENT_ROOT"];
   require($GLOBALS["doc_root"] . "/Script/functions.php");
@@ -80,7 +84,8 @@
 
   $GLOBALS["user_id"] = $_GET["u"];
   $user_ip = get_user_ip();
-  $users = update_users($_GET["u"], $user_ip);
+  update_user_file($_GET["u"], $user_ip);
+  $GLOBALS["users"] = array();
 
   
   if($_GET["a"] == 1 || $_GET["a"] == 2){
