@@ -1,8 +1,4 @@
 <?php
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  error_reporting(E_ALL);
-
 
   $GLOBALS["doc_root"] = $_SERVER["DOCUMENT_ROOT"];
   require($GLOBALS["doc_root"] . "/Script/functions.php");
